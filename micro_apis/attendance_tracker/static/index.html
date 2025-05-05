@@ -167,8 +167,9 @@
                 
                 <!-- Attendance Table -->
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 id="attendance-date">Attendance for <span id="current-date"></span></h5>
+                        <button class="btn btn-sm btn-success" id="apply-default-btn">Apply Default Attendance For Team</button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -279,6 +280,9 @@
                 setActiveNav(this);
                 toggleView('members');
             });
+            
+            // Apply default attendance button
+            document.getElementById('apply-default-btn').addEventListener('click', applyDefaultAttendance);
         });
         
         function toggleView(view) {
@@ -488,6 +492,30 @@
         function exportAttendance() {
             const date = document.getElementById('date-picker').value;
             window.open(`/api/attendance/export/?date_filter=${date}`, '_blank');
+        }
+        
+        function applyDefaultAttendance() {
+            // Call the API to apply default attendance
+            fetch('/api/attendance/default/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to apply default attendance');
+                return response.json();
+            })
+            .then(records => {
+                // Update UI with the returned attendance records
+                displayAttendance(records);
+                document.getElementById('no-records').classList.add('d-none');
+                alert('Default attendance applied successfully!');
+            })
+            .catch(error => {
+                console.error('Error applying default attendance:', error);
+                alert('Failed to apply default attendance. Please try again.');
+            });
         }
     </script>
 </body>

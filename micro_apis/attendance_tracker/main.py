@@ -127,6 +127,62 @@ def read_attendance_records(date_filter: Optional[date] = Query(None), db: Sessi
     
     return result
 
+@app.post("/api/attendance/default/", response_model=List[schemas.AttendanceRecord])
+def apply_default_attendance(db: Session = Depends(get_db)):
+    # Get today's date
+    today = date.today()
+    
+    # Get all team members
+    team_members = db.query(models.TeamMember).all()
+    
+    result = []
+    for member in team_members:
+        # Check if attendance record exists for today
+        existing_record = db.query(models.AttendanceRecord).filter(
+            models.AttendanceRecord.date == today,
+            models.AttendanceRecord.team_member_id == member.id
+        ).first()
+        
+        if existing_record:
+            # Update existing record to all present
+            existing_record.first_quarter = True
+            existing_record.second_quarter = True
+            existing_record.third_quarter = True
+            existing_record.fourth_quarter = True
+            db.commit()
+            db.refresh(existing_record)
+            
+            record = existing_record
+        else:
+            # Create new record with all present
+            new_record = models.AttendanceRecord(
+                date=today,
+                team_member_id=member.id,
+                first_quarter=True,
+                second_quarter=True,
+                third_quarter=True,
+                fourth_quarter=True
+            )
+            db.add(new_record)
+            db.commit()
+            db.refresh(new_record)
+            
+            record = new_record
+        
+        # Add to result with member info
+        result.append(schemas.AttendanceRecord(
+            id=record.id,
+            date=record.date,
+            team_member_email_id=member.email_id,
+            team_member_name=member.name,
+            first_quarter=record.first_quarter,
+            second_quarter=record.second_quarter,
+            third_quarter=record.third_quarter,
+            fourth_quarter=record.fourth_quarter
+        ))
+    
+    return result
+
 @app.get("/api/attendance/export/")
 def export_attendance_csv(date_filter: date, db: Session = Depends(get_db)):
     query = db.query(
