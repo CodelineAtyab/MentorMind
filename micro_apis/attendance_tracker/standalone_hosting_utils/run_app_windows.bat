@@ -8,15 +8,15 @@ if %ERRORLEVEL% NEQ 0 (
     echo Warning: Could not create directory, it may already exist.
 )
 
-REM 2. Get the absolute path of the parent directory of the script
+REM 2. Get the absolute path of the script directory
 SET "SCRIPT_DIR=%~dp0"
-REM Get parent directory (one level up from script location)
-for %%I in ("%SCRIPT_DIR%..") do SET "PARENT_DIR=%%~fI"
-echo Parent directory path: %PARENT_DIR%
+REM Calculate the absolute path of the attendance database directory
+SET "DB_DIR=%SCRIPT_DIR%mentor-mind-attendance-db"
+echo Database directory path: %DB_DIR%
 
-REM 3. Run docker with the parent directory as source for bind mount
+REM 3. Run docker with the attendance database directory as source for bind mount
 echo Starting Docker container...
-docker run --name mentor-mind-attendance-ease -d -p 8889:8888 -v "%PARENT_DIR%:/app/data" syedatyab/mm-basic-attendance-app:0.0.1
+docker run --name mentor-mind-attendance-ease -d -p 8889:8888 -v "%DB_DIR%:/app/data" syedatyab/mm-basic-attendance-app:0.0.1
 
 REM Wait a moment for Docker to initialize
 echo Waiting for container to initialize...
