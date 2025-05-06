@@ -168,7 +168,10 @@
                 <!-- Attendance Table -->
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 id="attendance-date">Attendance for <span id="current-date"></span></h5>
+                        <h5 id="attendance-date">
+                            Attendance for <span id="current-date"></span>
+                            (<span id="member-count">0</span> Team Members)
+                        </h5>
                         <button class="btn btn-sm btn-success" id="apply-default-btn">Apply Default Attendance For Team</button>
                     </div>
                     <div class="card-body">
@@ -353,6 +356,9 @@
             const tbody = document.getElementById('attendance-body');
             tbody.innerHTML = '';
             
+            // Update member count in the header
+            document.getElementById('member-count').textContent = records.length;
+            
             records.forEach(record => {
                 const row = document.createElement('tr');
                 row.dataset.email = record.team_member_email_id;
@@ -380,6 +386,9 @@
         function displayEmptyAttendance(members, date) {
             const tbody = document.getElementById('attendance-body');
             tbody.innerHTML = '';
+            
+            // Update member count in the header
+            document.getElementById('member-count').textContent = members.length;
             
             members.forEach(member => {
                 const row = document.createElement('tr');

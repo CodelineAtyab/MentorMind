@@ -144,17 +144,10 @@ def apply_default_attendance(db: Session = Depends(get_db)):
         ).first()
         
         if existing_record:
-            # Update existing record to all present
-            existing_record.first_quarter = True
-            existing_record.second_quarter = True
-            existing_record.third_quarter = True
-            existing_record.fourth_quarter = True
-            db.commit()
-            db.refresh(existing_record)
-            
+            # Keep existing record intact - don't modify it
             record = existing_record
         else:
-            # Create new record with all present
+            # Create new record with all present (only for members without records)
             new_record = models.AttendanceRecord(
                 date=today,
                 team_member_id=member.id,
