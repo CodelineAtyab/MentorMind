@@ -8,15 +8,15 @@ if [ $? -ne 0 ]; then
     echo "Warning: Could not create directory, it may already exist."
 fi
 
-# 2. Get the absolute path of the parent directory of the script
+# 2. Get the absolute path of the script directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# Get parent directory (one level up from script location)
-PARENT_DIR="$(dirname "$SCRIPT_DIR")"
-echo "Parent directory path: $PARENT_DIR"
+# Calculate the absolute path of the attendance database directory
+DB_DIR="${SCRIPT_DIR}/mentor-mind-attendance-db"
+echo "Database directory path: $DB_DIR"
 
-# 3. Run docker with the parent directory as source for bind mount
+# 3. Run docker with the attendance database directory as source for bind mount
 echo "Starting Docker container..."
-docker run --name mentor-mind-attendance-ease -d -p 8889:8888 -v "$PARENT_DIR:/app/data" syedatyab/mm-basic-attendance-app:0.0.1
+docker run --name mentor-mind-attendance-ease -d -p 8889:8888 -v "$DB_DIR:/app/data" syedatyab/mm-basic-attendance-app:0.0.1
 
 # Wait a moment for Docker to initialize
 echo "Waiting for container to initialize..."
